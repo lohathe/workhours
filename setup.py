@@ -22,8 +22,8 @@ def main():
         else:
             print("'rsync' available: expecting private keys up-to-date")
         data = {}
-        data["remote_folder"] = input("Backup folder where to store the history: ")
-        data["default_editor"] = input("The editor to use to modify the history: ")
+        data["remote_folder"] = input("Backup folder in remote server where to store the history: ")
+        data["default_editor"] = input("The editor to use to modify the text files: ")
         with open(config_file, "w") as f:
             json.dump(data, f)
     else:
