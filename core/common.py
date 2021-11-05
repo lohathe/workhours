@@ -1,4 +1,6 @@
 from pathlib import Path
+import datetime
+import re
 import json
 
 
@@ -19,3 +21,14 @@ def getConfig(key):
         print(f"Entry '{key}' not found in config file!")
         return None
     return data[key]
+
+
+def parseDate(line, default_year=2021):
+    date_matcher = re.compile("(\d+)/(\d+)(/(\d*))?$")
+    g = date_matcher.match(line)
+    if not g:
+        return None
+    year = int(g.group(4)) if g.group(4) else default_year
+    month = int(g.group(2))
+    day = int(g.group(1))
+    return datetime.date(year, month, day)
