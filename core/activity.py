@@ -11,11 +11,16 @@ def edit():
     return proc.returncode
 
 
-def list():
+def get():
     if not common.ACTIVITIES_FILE.exists():
         raise Exception("Activity file non found. Aborting.")
     with open(common.ACTIVITIES_FILE, "r") as f:
         data = json.load(f)
+    return data
+
+
+def list():
+    data = get()
     for acronym in data.keys():
         name = data[acronym]["name"]
         descr = data[acronym]["descr"]

@@ -4,17 +4,18 @@ from core import common
 from core import remote
 from core import stats
 import argparse
+import datetime
 import sys
 
 
 def addStatsParser(subparsers):
     parser = subparsers.add_parser("stats", description="Some statistics")
     group = parser.add_mutually_exclusive_group()
-    group.add_argument("-d", "--days", type=int, help="Group activities by days")
-    group.add_argument("-w", "--weeks", type=int, help="Group activities by weeks")
-    group.add_argument("-m", "--months", type=int, help="Group activities by months")
-    parser.add_argument("START", type=str, nargs="?", help="Starting date. Format dd/mm/yy")
-    parser.add_argument("END", type=str, nargs="?", help="End date. Format dd/mm/yy")
+    group.add_argument("-d", "--days", type=int, default=None, help="Group activities by days")
+    group.add_argument("-w", "--weeks", type=int, default=None, help="Group activities by weeks")
+    group.add_argument("-m", "--months", type=int, default=None, help="Group activities by months")
+    parser.add_argument("START", type=str, nargs="?", default=None, help="Starting date. Format dd/mm/yy")
+    parser.add_argument("END", type=str, nargs="?", default=None, help="End date. Format dd/mm/yy")
 
 
 def addRemoteParser(subparsers):
@@ -41,7 +42,18 @@ def main():
     args = parseArguments()
 
     if args.command == "stats":
-        return stats.do(args)
+        today = datetime.datetime.today()
+        unparsed_start_date = args.START or f"{today.day}/{today.month}/{today.year}"
+        start_date = common.parseDate(unparsed_start_date)
+        end_date = common.parseDate(args.END) if args.END else None
+        group_by = ("d", 1)
+        if args.days:
+            group_by = ("d", args.days)
+        elif args.weeks:
+            group_by = ("w", args.weeks)
+        elif args.months:
+            group_by = ("m", args.months)
+        return stats.aggregated(start_date, end_date, None, group_by)
     if args.command == "remote":
         if args.push:
             return remote.push()
