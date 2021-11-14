@@ -2,6 +2,7 @@
 from core import activity
 from core import common
 from core import remote
+from core import setup
 from core import stats
 import argparse
 import datetime
@@ -29,12 +30,18 @@ def addActivityParser(subparsers):
     parser.add_argument("-u", "--update", action="store_true", help="Manually edit the known activities")
 
 
+def addSetupParser(subparsers):
+    parser = subparsers.add_parser("setup", description="Manage installation of 'WorkHours'")
+    parser.add_argument("-i", "--info", action="store_true", help="Show current configurations")
+
+
 def parseArguments():
     parser = argparse.ArgumentParser(description="WorkHours...utility overlay on a simple txt file!\n")
     subparsers = parser.add_subparsers(dest="command", required=True)
     addStatsParser(subparsers)
     addRemoteParser(subparsers)
     addActivityParser(subparsers)
+    addSetupParser(subparsers)
     return parser.parse_args()
 
 
@@ -54,14 +61,22 @@ def main():
         elif args.months:
             group_by = ("m", args.months)
         return stats.aggregated(start_date, end_date, None, group_by)
+
     if args.command == "remote":
         if args.push:
             return remote.push()
+
     if args.command == "activity":
         if args.list:
             return activity.list()
         if args.update:
             return activity.edit()
+
+    if args.command == "setup":
+        if args.info:
+            setup.info()
+        else:
+            setup.install()
 
 
 if __name__ == "__main__":
