@@ -6,7 +6,7 @@ import json
 
 CONFIG_FOLDER = Path.home() / ".config" / "workhours"
 
-CONFIG_FILE = CONFIG_FOLDER / "conf"
+CONFIG_FILE = CONFIG_FOLDER / "conf.json"
 ACTIVITIES_FILE = CONFIG_FOLDER / "activities.json"
 HISTORY_FILE = CONFIG_FOLDER / "history.txt"
 
