@@ -73,7 +73,7 @@ def aggregated(start_date, end_date=None, filter_by=None, group_by=("d", 1)):
         else:
             warnings.warn("not implemented: can only filter by activity")
     groups = groupTasksByTimespan(tasks, start_date, group_by[0], group_by[1])
-    activities_name = activity.get()
+    activities_name = activity.acronymMap()
     for group in groups:
         ref_date, total_time, absolute, percentage = group.collapsed()
         if total_time <= 0:
@@ -83,7 +83,7 @@ def aggregated(start_date, end_date=None, filter_by=None, group_by=("d", 1)):
             a = absolute[k]
             p = percentage[k]
             n = activities_name.get(k, f"other({k})")
-            print(f" {n:>16s}: {p: >3.0%} > {a/60.:.1f}h")
+            print(f" {n: >16s}: {p: >3.0%} > {a/60.:.1f}h")
         print(f"------------------------ {total_time/60.:.1f}h")
         print()
     return 0

@@ -26,3 +26,8 @@ def list():
         descr = data[acronym]["descr"]
         print(f"* [{acronym}] {name} > {descr}")
     return 0
+
+
+def acronymMap():
+    data = get()
+    return {k: v["name"] for k, v in data.items()}
