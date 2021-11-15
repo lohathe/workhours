@@ -1,4 +1,5 @@
 from . import common
+import datetime
 import json
 import shutil
 
@@ -15,7 +16,7 @@ def check_dependencies():
         print("Cannot find 'matplotlib': graphs for statistics will probably fail!")
 
 
-def install()
+def install():
     print("Installing 'WorkHours'...")
 
     if common.CONFIG_FOLDER.exists():
@@ -32,12 +33,29 @@ def install()
     with open(common.CONFIG_FILE, "w") as f:
         json.dump(data, f)
 
+    default_activity = {
+        "wm": {
+            "name": "workstation management",
+            "descr": "time spent updating, installing, managing the PC.",
+        }
+    }
+    with open(common.ACTIVITIES_FILE, "w") as f:
+        json.dump(default_activity, f)
+    print("Remember to update the activity file! It can be done using the 'activity' subcommand.")
+
+    with open(common.HISTORY_FILE, "a") as f:
+        today = datetime.date.today()
+        f.write(f"{today.day}/{today.month}/{today.year}\n")
+        f.write("00:10 - wm | workhours > installing 'WorkHours'\n")
+    print("Remember to update the history file! It can be done using the 'tasklist' subcommand.")
+
     check_dependencies()
     print("Remember to update $PATH or create the necessary symlink to use 'WorkHours' with ease!")
     return 0
 
 
 def info():
+    print("==( stored configuration )==========")
     if not common.CONFIG_FOLDER.exists():
         print("'WorkHours' seems not installed yet...aborting!")
         return 1
@@ -56,4 +74,6 @@ def info():
         print("No default editor found in config file. Main program may not work correctly.")
     else:
         print(f"Default editor: '{default_editor}'.")
+
+    check_dependencies()
     return 0
