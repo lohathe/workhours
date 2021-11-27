@@ -38,10 +38,11 @@ Example:
 01:30 - d | WorkHours > add code to perform statistics
 
 """
-import re
-import warnings
-import datetime
 from . import common
+import datetime
+import re
+import subprocess
+import warnings
 
 
 class TaskEntry(object):
@@ -91,3 +92,11 @@ def get():
                 continue
             res.append(TaskEntry(current_date, line))
     return res
+
+
+def edit():
+    editor = common.getConfig("default_editor")
+    if editor is None:
+        raise Exception("Editor not configured. Aborting.")
+    proc = subprocess.run([editor, str(common.HISTORY_FILE)])
+    return proc.returncode

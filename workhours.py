@@ -4,6 +4,7 @@ from core import common
 from core import remote
 from core import setup
 from core import stats
+from core import taskslist
 import argparse
 import datetime
 import sys
@@ -36,12 +37,18 @@ def addSetupParser(subparsers):
     parser.add_argument("-i", "--info", action="store_true", help="Show current configurations")
 
 
+def addHistoryParser(subparsers):
+    parser = subparsers.add_parser("history", description="Manage history/tasks-list file")
+    parser.add_argument("-u", "--update", action="store_true", help="Manually edit the history/tasts-list file")
+
+
 def parseArguments():
     parser = argparse.ArgumentParser(description="WorkHours...utility overlay on a simple txt file!\n")
     subparsers = parser.add_subparsers(dest="command", required=True)
     addStatsParser(subparsers)
     addRemoteParser(subparsers)
     addActivityParser(subparsers)
+    addHistoryParser(subparsers)
     addSetupParser(subparsers)
     return parser.parse_args()
 
@@ -77,11 +84,15 @@ def main():
         if args.update:
             return activity.edit()
 
+    if args.command == "history":
+        if args.update:
+            return taskslist.edit()
+
     if args.command == "setup":
         if args.info:
-            setup.info()
+            return setup.info()
         else:
-            setup.install()
+            return setup.install()
 
 
 if __name__ == "__main__":
