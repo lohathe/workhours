@@ -15,6 +15,7 @@ def addStatsParser(subparsers):
     group.add_argument("-d", "--days", type=int, default=None, help="Group activities by days")
     group.add_argument("-w", "--weeks", type=int, default=None, help="Group activities by weeks")
     group.add_argument("-m", "--months", type=int, default=None, help="Group activities by months")
+    parser.add_argument("-g", "--graph", action="store_true", default=False, help="Use graph to show results")
     parser.add_argument("START", type=str, nargs="?", default=None, help="Starting date. Format dd/mm/yy")
     parser.add_argument("END", type=str, nargs="?", default=None, help="End date. Format dd/mm/yy")
 
@@ -60,7 +61,11 @@ def main():
             group_by = ("w", args.weeks)
         elif args.months:
             group_by = ("m", args.months)
-        return stats.aggregated(start_date, end_date, None, group_by)
+
+        if args.graph:
+            return stats.graph(start_date, end_date, None, group_by)
+        else:
+            return stats.aggregated(start_date, end_date, None, group_by)
 
     if args.command == "remote":
         if args.push:

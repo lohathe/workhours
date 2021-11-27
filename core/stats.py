@@ -64,7 +64,7 @@ def groupTasksByTimespan(tasks, start_date, granularity="d", quantity=1):
 
 def aggregated(start_date, end_date=None, filter_by=None, group_by=("d", 1)):
     if start_date is None:
-        raise Exception("stats.list must have a start date!")
+        raise Exception("stats.aggregated must have a start date!")
     tasks = taskslist.get()
     tasks = filterByDate(tasks, start_date, end_date)
     if filter_by is not None:
@@ -89,5 +89,42 @@ def aggregated(start_date, end_date=None, filter_by=None, group_by=("d", 1)):
     return 0
 
 
-def graph():
-    pass
+def graph(start_date, end_date=None, filter_by=None, group_by=("d", 1)):
+    if start_date is None:
+        raise Exception("stats.graph must have a start date!")
+    tasks = taskslist.get()
+    tasks = filterByDate(tasks, start_date, end_date)
+    if filter_by is not None:
+        if filter_by[0] == "activity":
+            tasks = filterByActivity(tasks, filter_by[1])
+        else:
+            warnings.warn("not implemented: can only filter by activity")
+    groups = groupTasksByTimespan(tasks, start_date, group_by[0], group_by[1])
+    activities_name = activity.acronymMap()
+    used_activities = {t.activity_type for t in tasks}
+
+    import matplotlib.pyplot as plt
+    fig, ax = plt.subplots()
+    ax.set_ylim([-0.1, 1.0])
+    lines = []
+    for a in used_activities:
+        data = [(g.ref_date, g.collapsed()[3].get(a, 0)) for g in groups]
+        xs, ys = zip(*data)
+        label = activities_name.get(a, f"other({a})")
+        line = ax.plot(xs, ys, lw=2, label=label)
+        lines.append(line)
+    legend = ax.legend(fancybox=True, shadow=True, bbox_to_anchor=(1,1), loc="upper left")
+    lines_map = {}
+    for legend_line, original_line in zip(legend.get_lines(), lines):
+        legend_line.set_picker(True)
+        lines_map[legend_line] = original_line
+    def on_picker(event):
+        legend_line = event.artist
+        original_line = lines_map[legend_line][0]
+        visible = not original_line.get_visible()
+        original_line.set_visible(visible)
+        legend_line.set_alpha(1.0 if visible else 0.2)
+        fig.canvas.draw()
+    fig.canvas.mpl_connect("pick_event", on_picker)
+    plt.show()
+    return 0
