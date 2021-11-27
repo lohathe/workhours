@@ -30,6 +30,14 @@ class TasksGroup:
         self.ref_date = ref_date
         self.tasks = tasks or []
 
+    def totalDuration(self):
+        return sum(t.duration for t in self.tasks)
+
+    def perActivityType(self):
+        preformed_activities = {t.activity_type for t in self.tasks}
+        for preformed_activity in sorted(preformed_activities):
+            yield (preformed_activity, [t for t in self.tasks if t.activity_type == preformed_activity])
+
     def collapsed(self):
         if len(self.tasks) == 0:
             return (self.ref_date, 0, {}, {})

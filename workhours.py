@@ -1,6 +1,7 @@
 #!/bin/env python3
 from core import activity
 from core import common
+from core import export
 from core import remote
 from core import setup
 from core import stats
@@ -17,6 +18,12 @@ def addStatsParser(subparsers):
     group.add_argument("-w", "--weeks", type=int, default=None, help="Group activities by weeks")
     group.add_argument("-m", "--months", type=int, default=None, help="Group activities by months")
     parser.add_argument("-g", "--graph", action="store_true", default=False, help="Use graph to show results")
+    parser.add_argument("START", type=str, nargs="?", default=None, help="Starting date. Format dd/mm/yy")
+    parser.add_argument("END", type=str, nargs="?", default=None, help="End date. Format dd/mm/yy")
+
+
+def addExportParser(subparsers):
+    parser = subparsers.add_parser("export", description="Export deatils of history")
     parser.add_argument("START", type=str, nargs="?", default=None, help="Starting date. Format dd/mm/yy")
     parser.add_argument("END", type=str, nargs="?", default=None, help="End date. Format dd/mm/yy")
 
@@ -46,6 +53,7 @@ def parseArguments():
     parser = argparse.ArgumentParser(description="WorkHours...utility overlay on a simple txt file!\n")
     subparsers = parser.add_subparsers(dest="command", required=True)
     addStatsParser(subparsers)
+    addExportParser(subparsers)
     addRemoteParser(subparsers)
     addActivityParser(subparsers)
     addHistoryParser(subparsers)
@@ -53,13 +61,16 @@ def parseArguments():
     return parser.parse_args()
 
 
+def todayDate():
+    today = datetime.datetime.today()
+    return f"{today.day}/{today.month}/{today.year}"
+
+
 def main():
     args = parseArguments()
 
     if args.command == "stats":
-        today = datetime.datetime.today()
-        unparsed_start_date = args.START or f"{today.day}/{today.month}/{today.year}"
-        start_date = common.parseDate(unparsed_start_date)
+        start_date = common.parseDate(args.START or todayDate())
         end_date = common.parseDate(args.END) if args.END else None
         group_by = ("d", 1)
         if args.days:
@@ -73,6 +84,11 @@ def main():
             return stats.graph(start_date, end_date, None, group_by)
         else:
             return stats.aggregated(start_date, end_date, None, group_by)
+
+    if args.command == "export":
+        start_date = common.parseDate(args.START or todayDate())
+        end_date = common.parseDate(args.END) if args.END else None
+        return export.list(start_date, end_date)
 
     if args.command == "remote":
         if args.push:
