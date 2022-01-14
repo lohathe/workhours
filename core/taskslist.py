@@ -81,14 +81,20 @@ class TaskEntry(object):
 def get():
     res = []
     with open(common.HISTORY_FILE, "r") as f:
-        current_date = datetime.date(1970, 1, 1)
+        current_year = 1970
+        current_date = datetime.date(current_year, 1, 1)
         for line in f:
             line = line.strip()
             if not line or line[0] == '#':
                 continue
-            date = common.parseDate(line)
+            date = common.parseDate(line, default_year=current_year)
             if date:
                 current_date = date
+                # we are lazy in writing the year in each entry. However
+                # sometimes (it should be once every year :P) we have to write
+                # an entry specifying the correct year...from that point onward
+                # all subsequent dates should have a different default year!
+                current_year = date.year
                 continue
             res.append(TaskEntry(current_date, line))
     return res
