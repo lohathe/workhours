@@ -27,8 +27,8 @@ def list(start_date, end_date):
         print(f"==({group.ref_date})====  {duration}")
         for a, ts in group.perActivityType():
             activity_name = formatActivity(a)
-            activity_duration = formatDuration(sum([t.duration for t in ts]))
-            print(f"#{activity_name:<20s} {activity_duration}")
+            print(formatDuration(sum([t.duration for t in ts])))
+            print(f"#{activity_name:<20s}")
             for t in ts:
                 print(f" * {t.project} {t.content}")
     return 0
