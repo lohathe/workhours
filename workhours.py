@@ -70,8 +70,9 @@ def main():
     args = parseArguments()
 
     if args.command == "stats":
-        start_date = common.parseDate(args.START or todayDate())
-        end_date = common.parseDate(args.END) if args.END else None
+        current_year = datetime.datetime.today().year
+        start_date = common.parseDate(args.START or todayDate(), default_year=current_year)
+        end_date = common.parseDate(args.END, default_year=current_year) if args.END else None
         group_by = ("d", 1)
         if args.days:
             group_by = ("d", args.days)
@@ -86,8 +87,9 @@ def main():
             return stats.aggregated(start_date, end_date, None, group_by)
 
     if args.command == "export":
-        start_date = common.parseDate(args.START or todayDate())
-        end_date = common.parseDate(args.END) if args.END else None
+        current_year = datetime.datetime.today().year
+        start_date = common.parseDate(args.START or todayDate(), default_year=current_year)
+        end_date = common.parseDate(args.END, default_year=current_year) if args.END else None
         return export.list(start_date, end_date)
 
     if args.command == "remote":
